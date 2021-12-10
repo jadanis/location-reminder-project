@@ -182,7 +182,7 @@ class SaveReminderFragment : BaseFragment() {
             addOnCompleteListener {
                 geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent)?.run {
                     addOnSuccessListener {
-                        Log.e("Add Geofence", geofence.requestId)
+                        Log.i("Add Geofence", geofence.requestId)
                         //viewModel.geofenceActivated()
                     }
                     addOnFailureListener {
