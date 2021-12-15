@@ -80,7 +80,7 @@ class SaveReminderFragment : BaseFragment() {
 
             checkPermissionsAndStartGeofencing()
 
-//            TODO: use the user entered reminder details to:
+//           use the user entered reminder details to:
 //             1) add a geofencing request
 //             2) save the reminder to the local db
         }
@@ -123,7 +123,7 @@ class SaveReminderFragment : BaseFragment() {
         return foregroundLocationApproved && backgroundPermissionApproved
     }
 
-    //TODO: update for this app
+    //update for this app
     private fun checkDeviceLocationSettingsAndStartGeofence(resolve:Boolean = true) {
         val locationRequest = LocationRequest.create().apply {
             priority = LocationRequest.PRIORITY_LOW_POWER
