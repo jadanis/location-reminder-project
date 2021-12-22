@@ -40,6 +40,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private lateinit var binding: FragmentSelectLocationBinding
 
     private val REQUEST_LOCATION_PERMISSION = 1
+    private val TAG = SelectLocationFragment::class.java.simpleName
 
     private lateinit var map: GoogleMap
 
@@ -68,7 +69,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
         mapFragment.getMapAsync(this)
 //        TODO: zoom to the user location after taking his permission
-//        TODO: add style to the map
         onLocationSelected()
 
         return binding.root
@@ -86,10 +86,9 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         map.addMarker(MarkerOptions().position(homeLatLng))
         setMapClick(map)
         setPoiClick(map)
-
+        setMapStyle(map)
 //        setMapLongClick(map)
 //        setPoiClick(map)
-//        setMapStyle(map)
 
     }
 
@@ -182,6 +181,25 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             )
             //poiMarker.showInfoWindow()
             googleMap.animateCamera(CameraUpdateFactory.newLatLng(poi.latLng))
+        }
+    }
+
+    private fun setMapStyle(map: GoogleMap) {
+        try {
+            // Customize the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            val success = map.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    context,
+                    R.raw.map_style
+                )
+            )
+
+            if (!success) {
+                Log.e(TAG, "Style parsing failed.")
+            }
+        } catch (e: Resources.NotFoundException) {
+            Log.e(TAG, "Can't find style. Error: ", e)
         }
     }
 
