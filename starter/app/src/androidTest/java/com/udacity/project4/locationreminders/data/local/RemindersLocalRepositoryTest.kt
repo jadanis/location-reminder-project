@@ -45,7 +45,7 @@ class RemindersLocalRepositoryTest {
         localDataSource =
             RemindersLocalRepository(
                 database.reminderDao(),
-                Dispatchers.Main
+                Dispatchers.Unconfined
             )
     }
 
@@ -73,6 +73,7 @@ class RemindersLocalRepositoryTest {
         assertThat(result.data, `is`(reminder))
     }
 
+    //TODO: fix error: IllegalStateException This Job has not completed
     @Test
     fun getAllReminders() = runBlockingTest {
         //GIVEN
@@ -100,6 +101,7 @@ class RemindersLocalRepositoryTest {
 
     }
 
+    //TODO: fix error, same as above
     @Test
     fun deleteAllReminders() = runBlockingTest {
         //GIVEN

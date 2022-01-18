@@ -159,7 +159,6 @@ class SaveReminderFragment : BaseFragment() {
 
     private fun addGeofenceForReminder(reminderDataItem: ReminderDataItem) {
 
-        //TODO: default lat and long
         val lat = reminderDataItem.latitude ?: 0.0
         val long = reminderDataItem.longitude ?: 0.0
 

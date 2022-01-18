@@ -5,11 +5,9 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import com.udacity.project4.locationreminders.RemindersActivity
@@ -24,7 +22,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -34,6 +31,18 @@ import org.koin.test.get
 import org.hamcrest.Matchers.not
 import org.junit.After
 import org.junit.Rule
+import androidx.test.espresso.action.Press
+
+import androidx.test.espresso.action.CoordinatesProvider
+
+import androidx.test.espresso.action.Tap
+
+import androidx.test.espresso.action.GeneralClickAction
+
+import androidx.test.espresso.ViewAction
+
+
+
 
 //@RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -110,21 +119,44 @@ class RemindersActivityTest :
         //Save without title
         onView(withId(R.id.saveReminder)).perform(click())
         onView(withId(R.id.snackbar_text)).check(matches(withText(R.string.err_enter_title)))
+        Thread.sleep(3000)
         //Enter title save without location
-        onView(withId(R.id.reminderTitle)).perform(typeText("Title 1"))
+        onView(withId(R.id.reminderTitle)).perform(typeText("Title 1"), closeSoftKeyboard())
         onView(withId(R.id.saveReminder)).perform(click())
         onView(withId(R.id.snackbar_text)).check(matches(withText(R.string.err_select_location)))
         //Enter Description
-        onView(withId(R.id.reminderDescription)).perform(typeText("Desc"))
+        onView(withId(R.id.reminderDescription)).perform(typeText("Desc"), closeSoftKeyboard())
         //Select location
         onView(withId(R.id.selectLocation)).perform(click())
-        onView(withId(R.id.map)).perform(click())
+        onView(withId(R.id.map)).perform(clickXY(50,50))
         onView(withId(R.id.save_button)).perform(click())
+        //Check is populated
         onView(withId(R.id.selectedLocation)).check(matches(not(withText(""))))
+        //Save
+        onView(withId(R.id.saveReminder)).perform(click())
+        //Check no data view is hidden
+        Thread.sleep(3000)
+        onView(withId(R.id.noDataTextView)).check(matches(not(isDisplayed())))
 
         activityScenario.close()
     }
 
-//    TODO: add End to End testing to the app
+    // ViewAction to click on Map
+    //solution from https://stackoverflow.com/questions/22177590/click-by-bounds-coordinates/22798043#22798043
+    private fun clickXY(x: Int, y: Int): ViewAction? {
+        return GeneralClickAction(
+            Tap.SINGLE,
+            CoordinatesProvider { view ->
+                val screenPos = IntArray(2)
+                view.getLocationOnScreen(screenPos)
+                val screenX = (screenPos[0] + x).toFloat()
+                val screenY = (screenPos[1] + y).toFloat()
+                floatArrayOf(screenX, screenY)
+            },
+            Press.FINGER
+        )
+    }
+
+//    add End to End testing to the app
 
 }
