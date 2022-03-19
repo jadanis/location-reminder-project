@@ -85,7 +85,8 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
 
     //get the request id of the current geofence
     private fun sendNotification(triggeringGeofences: List<Geofence>) {
-        val requestId = triggeringGeofences[0].requestId
+        //chagne to loop through geofences per submission feedback
+       val requestIds = triggeringGeofences.map{ geoFence: Geofence -> geoFence.requestId }
 
         //Get the local repository instance
         //Accorindg to mentor question: https://knowledge.udacity.com/questions/757609
@@ -93,20 +94,24 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
 //        Interaction to the repository has to be through a coroutine scope
         CoroutineScope(coroutineContext).launch(SupervisorJob()) {
             //get the reminder with the request id
-            val result = remindersLocalRepository.getReminder(requestId)
-            if (result is Result.Success<ReminderDTO>) {
-                val reminderDTO = result.data
-                //send a notification to the user with the reminder details
-                sendNotification(
-                    this@GeofenceTransitionsJobIntentService, ReminderDataItem(
-                        reminderDTO.title,
-                        reminderDTO.description,
-                        reminderDTO.location,
-                        reminderDTO.latitude,
-                        reminderDTO.longitude,
-                        reminderDTO.id
+            //Change to loop through geofences per submission feedback
+            val result = remindersLocalRepository.getReminders()
+            if (result is Result.Success<List<ReminderDTO>>) {
+                val reminders = result.data.filter { reminderDTO -> requestIds.contains(reminderDTO.id) }
+                for(reminderDTO in reminders){
+
+                    //send a notification to the user with the reminder details
+                    sendNotification(
+                        this@GeofenceTransitionsJobIntentService, ReminderDataItem(
+                            reminderDTO.title,
+                            reminderDTO.description,
+                            reminderDTO.location,
+                            reminderDTO.latitude,
+                            reminderDTO.longitude,
+                            reminderDTO.id
+                        )
                     )
-                )
+                }
             }
         }
     }
