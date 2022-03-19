@@ -40,8 +40,7 @@ import androidx.test.espresso.action.Tap
 import androidx.test.espresso.action.GeneralClickAction
 
 import androidx.test.espresso.ViewAction
-
-
+import com.udacity.project4.utils.EspressoIdlingResource
 
 
 //@RunWith(AndroidJUnit4::class)
@@ -96,11 +95,13 @@ class RemindersActivityTest :
 
     @Before
     fun registerIdlingResource(){
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
         IdlingRegistry.getInstance().register(dataBindingIdlingResource)
     }
 
     @After
     fun unregisterIdlingResource(){
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
         IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
     }
 
