@@ -2,10 +2,13 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.location.Location
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.*
 import androidx.core.app.ActivityCompat
@@ -29,6 +32,10 @@ import com.google.android.gms.maps.model.LatLng
 
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
+import com.google.android.material.snackbar.Snackbar
+import com.udacity.project4.BuildConfig
+import com.udacity.project4.locationreminders.savereminder.SaveReminderFragment
+import java.util.concurrent.TimeUnit
 
 
 class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
@@ -149,20 +156,53 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     //https://developer.android.com/training/permissions/requesting
     //override permission result
+//    override fun onRequestPermissionsResult(
+//        requestCode: Int,
+//        permissions: Array<out String>,
+//        grantResults: IntArray
+//    ) {
+//        when(requestCode){
+//            REQUEST_LOCATION_PERMISSION ->
+//                if((grantResults.isNotEmpty() &&
+//                            grantResults[0] == PackageManager.PERMISSION_GRANTED)){
+//                    enableMyLocation()
+//                } else {
+//                    _viewModel.showSnackBar.postValue(getString(R.string.location_required_error))
+//                }
+//            else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+//        }
+//    }
+
+    //Per submission feedback
+    //tried to tweek onRequestPermissions
     override fun onRequestPermissionsResult(
         requestCode: Int,
-        permissions: Array<out String>,
+        permissions: Array<String>,
         grantResults: IntArray
     ) {
-        when(requestCode){
-            REQUEST_LOCATION_PERMISSION ->
-                if((grantResults.isNotEmpty() &&
-                            grantResults[0] == PackageManager.PERMISSION_GRANTED)){
-                    enableMyLocation()
-                } else {
-                    _viewModel.showSnackBar.postValue(getString(R.string.location_required_error))
-                }
-            else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Log.d(TAG, "onRequestPermissionResult")
+
+        if (
+            grantResults.isEmpty() ||
+            grantResults[LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED ||
+            (requestCode == REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE &&
+                    grantResults[BACKGROUND_LOCATION_PERMISSION_INDEX] ==
+                    PackageManager.PERMISSION_DENIED))
+        {
+            Snackbar.make(
+                binding.root,
+                R.string.permission_denied_explanation,
+                Snackbar.LENGTH_INDEFINITE
+            )
+                .setAction(R.string.settings) {
+                    startActivity(Intent().apply {
+                        action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                        data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    })
+                }.show()
+        } else {
+            enableMyLocation()
         }
     }
 
@@ -204,8 +244,13 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             getDeviceLocation()
         }
         else {
-            ActivityCompat.requestPermissions(
-                activity!!,
+//            ActivityCompat.requestPermissions(
+//                activity!!,
+//                arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
+//                REQUEST_LOCATION_PERMISSION
+//            )
+    //per submission feedback
+            this.requestPermissions(
                 arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
                 REQUEST_LOCATION_PERMISSION
             )
@@ -270,6 +315,19 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         } catch (e: Resources.NotFoundException) {
             Log.e(TAG, "Can't find style. Error: ", e)
         }
+    }
+
+    companion object {
+        private val GEOFENCE_EXPIRATION_IN_MILLISECONDS: Long = TimeUnit.HOURS.toMillis(1)
+        private const val GEOFENCE_RADIUS_IN_METERS = 100f
+        private const val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 33
+        private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
+        private const val REQUEST_TURN_DEVICE_LOCATION_ON = 29
+        private const val TAG = "SelectLocationFragment"
+        internal const val ACTION_GEOFENCE_EVENT =
+            "TODO: get the right event title"
+        private const val LOCATION_PERMISSION_INDEX = 0
+        private const val BACKGROUND_LOCATION_PERMISSION_INDEX = 1
     }
 
 }

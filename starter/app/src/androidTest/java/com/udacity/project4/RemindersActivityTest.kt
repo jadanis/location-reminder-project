@@ -137,6 +137,8 @@ class RemindersActivityTest :
         onView(withId(R.id.saveReminder)).perform(click())
         //Check no data view is hidden
         Thread.sleep(3000)
+        //Not sure how to test toast message
+        onView(withText("Reminder Saved!")).check(matches(isDisplayed()))
         onView(withId(R.id.noDataTextView)).check(matches(not(isDisplayed())))
 
         activityScenario.close()
