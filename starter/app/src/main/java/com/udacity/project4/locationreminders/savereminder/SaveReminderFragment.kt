@@ -177,18 +177,16 @@ class SaveReminderFragment : BaseFragment() {
             .addGeofence(geofence)
             .build()
 
-        geofencingClient.removeGeofences(geofencePendingIntent)?.run {
-            addOnCompleteListener {
-                geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent)?.run {
-                    addOnSuccessListener {
-                        Log.i("Add Geofence", geofence.requestId)
-                        //viewModel.geofenceActivated()
-                    }
-                    addOnFailureListener {
-                        if ((it.message != null)) {
-                            Log.w(TAG, it.message!!)
-                        }
-                    }
+        //Per Submission feedback
+        //do not remove geofences
+        geofencingClient.addGeofences(geofencingRequest,geofencePendingIntent)?.run {
+            addOnSuccessListener {
+                Log.i("Add Geofence", geofence.requestId)
+                //viewModel.geofenceActivated()
+            }
+            addOnFailureListener {
+                if ((it.message != null)) {
+                    Log.w(TAG, it.message!!)
                 }
             }
         }
