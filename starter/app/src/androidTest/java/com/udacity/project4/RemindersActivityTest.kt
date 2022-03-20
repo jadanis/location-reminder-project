@@ -40,7 +40,10 @@ import androidx.test.espresso.action.Tap
 import androidx.test.espresso.action.GeneralClickAction
 
 import androidx.test.espresso.ViewAction
+import androidx.test.espresso.matcher.RootMatchers.withDecorView
+import com.google.android.material.internal.ContextUtils.getActivity
 import com.udacity.project4.utils.EspressoIdlingResource
+import org.hamcrest.Matchers.`is`
 
 
 //@RunWith(AndroidJUnit4::class)
@@ -137,8 +140,9 @@ class RemindersActivityTest :
         onView(withId(R.id.saveReminder)).perform(click())
         //Check no data view is hidden
         Thread.sleep(3000)
-        //Not sure how to test toast message
-        onView(withText("Reminder Saved!")).check(matches(isDisplayed()))
+        //per submission feedback
+        //https://stackoverflow.com/questions/28390574/checking-toast-message-in-android-espresso/28606603#28606603
+        onView(withText(R.string.reminder_saved)).inRoot(withDecorView(not(activityRule.activity.window.decorView))).check(matches(isDisplayed()))
         onView(withId(R.id.noDataTextView)).check(matches(not(isDisplayed())))
 
         activityScenario.close()
